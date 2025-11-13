@@ -3,15 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>City Not Found</title>
-    <link href="{{ url_for('static', filename='styles/style.css')}} " rel="stylesheet" />
+    <meta name="description" content="City not found - Try searching for another location">
+    <meta name="theme-color" content="#667eea">
+    <title>City Not Found - Weather App</title>
+    
+    <!-- Stylesheets -->
+    <link href="{{ url_for('static', filename='styles/style.css') }}" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌤️</text></svg>">
 </head>
+
 <body>
-    <h1>City Not Found</h1>    
-    <h2>Try Again?</h2>
-    <form action="/weather">
-        <input type="text" name="city" id="city" placeholder="Enter a City"/>
-        <button type="submit">Submit</button>
-    </form>
+    <div class="weather-container">
+        <h1 class="weather-title">City Not Found</h1>
+        
+        <div class="weather-info">
+            <span class="weather-icon">🔍</span>
+            <div class="weather-status" style="font-size: 1.1rem; margin-bottom: 1rem;">
+                We couldn't find that location
+            </div>
+            <div class="feels-like">
+                Please check the spelling and try again
+            </div>
+        </div>
+
+        <form action="/weather" class="search-form">
+            <input 
+                type="text" 
+                name="city" 
+                id="city" 
+                class="search-input"
+                placeholder="Try another city name..."
+                autocomplete="off"
+            />
+            <button type="submit" class="search-button">
+                Search Again
+            </button>
+        </form>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/weather.js') }}"></script>
 </body>
 </html>
