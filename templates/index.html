@@ -27,19 +27,63 @@
             </div>
         </div>
 
-        <form action="/weather" class="search-form">
-            <input 
-                type="text" 
-                name="city" 
-                id="city" 
-                class="search-input"
-                placeholder="Enter a city name..."
-                autocomplete="off"
-            />
-            <button type="submit" class="search-button">
-                Get Weather
-            </button>
+        <form action="/weather" class="search-form" id="weatherForm">
+            <div class="form-row">
+                <input 
+                    type="text" 
+                    name="city" 
+                    id="city" 
+                    class="search-input"
+                    placeholder="Enter a city name..."
+                    autocomplete="off"
+                    list="city-suggestions"
+                />
+                <datalist id="city-suggestions"></datalist>
+            </div>
+            
+            <div class="form-row">
+                <select name="country" id="country" class="search-select">
+                    <option value="">Select Country (Optional)</option>
+                    {% for country_name, code in countries.items() %}
+                    <option value="{{ country_name }}">{{ country_name }}</option>
+                    {% endfor %}
+                </select>
+                
+                <select name="units" id="units" class="search-select">
+                    <option value="metric">Celsius (°C)</option>
+                    <option value="imperial">Fahrenheit (°F)</option>
+                    <option value="kelvin">Kelvin (K)</option>
+                </select>
+            </div>
+            
+            <div class="action-buttons">
+                <button type="submit" class="search-button">
+                    🔍 Get Weather
+                </button>
+                <button type="button" class="action-btn gps-btn" onclick="getLocationWeather()">
+                    📍 Use My Location
+                </button>
+            </div>
         </form>
+
+        <!-- Quick Tips -->
+        <div class="tips-section">
+            <h4>💡 Quick Tips</h4>
+            <div class="tips-grid">
+                <div class="tip-item">
+                    <span class="tip-icon">⌨️</span>
+                    <span class="tip-text">Press Ctrl+K to focus search</span>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🌍</span>
+                    <span class="tip-text">Select country for precise results</span>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">📍</span>
+                    <span class="tip-text">Use GPS for instant local weather</span>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="{{ url_for('static', filename='js/weather.js') }}"></script>

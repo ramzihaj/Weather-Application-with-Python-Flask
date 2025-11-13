@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Weather search history">
+    <meta name="theme-color" content="#667eea">
+    <title>Search History - Weather App</title>
+    
+    <!-- Stylesheets -->
+    <link href="{{ url_for('static', filename='styles/style.css') }}" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌤️</text></svg>">
+</head>
+
+<body>
+    <div class="weather-container history-container">
+        <div class="weather-header">
+            <h1 class="weather-title">Search History</h1>
+            {% if message %}
+            <div class="success-message">{{ message }}</div>
+            {% endif %}
+        </div>
+
+        {% if history %}
+        <div class="history-list">
+            {% for item in history %}
+            <div class="history-card">
+                <a href="/weather?city={{ item.city }}&units={{ item.units }}" class="history-link">
+                    <div class="history-main">
+                        <div class="history-location">
+                            <span class="location-name">{{ item.city }}, {{ item.country }}</span>
+                            <span class="location-temp">{{ "%.1f"|format(item.temp) }}{% if item.units == 'metric' %}°C{% elif item.units == 'imperial' %}°F{% else %}K{% endif %}</span>
+                        </div>
+                        <div class="history-time">{{ item.timestamp }}</div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="action-buttons">
+            <a href="/clear_history" class="action-btn danger-btn" onclick="return confirm('Are you sure you want to clear all search history?')">
+                🗑️ Clear History
+            </a>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">🕒</div>
+            <h3>No Search History</h3>
+            <p>Your recent weather searches will appear here</p>
+        </div>
+        {% endif %}
+
+        <div class="action-buttons">
+            <a href="/" class="action-btn">
+                🏠 Back to Home
+            </a>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/weather.js') }}"></script>
+</body>
+</html>

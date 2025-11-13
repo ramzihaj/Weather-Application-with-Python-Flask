@@ -18,30 +18,137 @@
 
 <body>
     <div class="weather-container">
-        <h1 class="weather-title">{{ title }} Weather</h1>
+        <div class="weather-header">
+            <h1 class="weather-title">{{ title }}, {{ country }}</h1>
+            <div class="coordinates">📍 {{ "%.2f"|format(coordinates.lat) }}, {{ "%.2f"|format(coordinates.lon) }}</div>
+        </div>
         
         <div class="weather-info">
             <span class="weather-icon">🌤️</span>
             <div class="temperature">
-                {{ temp }}<span style="font-size: 0.6em;">°</span>
+                {{ temp }}<span style="font-size: 0.6em;">{{ temp_unit }}</span>
             </div>
             <div class="weather-status">{{ status }}</div>
-            <div class="feels-like">Feels like {{ feels_like }}°</div>
+            <div class="feels-like">Feels like {{ feels_like }}{{ temp_unit }}</div>
         </div>
 
-        <form action="/weather" class="search-form">
-            <input 
-                type="text" 
-                name="city" 
-                id="city" 
-                class="search-input"
-                placeholder="Enter a city name..."
-                autocomplete="off"
-            />
+        <!-- Detailed Weather Info -->
+        <div class="weather-details">
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <span class="detail-icon">💧</span>
+                    <span class="detail-label">Humidity</span>
+                    <span class="detail-value">{{ humidity }}%</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-icon">🌪️</span>
+                    <span class="detail-label">Pressure</span>
+                    <span class="detail-value">{{ pressure }} hPa</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-icon">💨</span>
+                    <span class="detail-label">Wind</span>
+                    <span class="detail-value">{{ "%.1f"|format(wind_speed) }} {% if units == 'metric' %}m/s{% else %}mph{% endif %}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-icon">👁️</span>
+                    <span class="detail-label">Visibility</span>
+                    <span class="detail-value">{{ "%.1f"|format(visibility) }} km</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-icon">🌅</span>
+                    <span class="detail-label">Sunrise</span>
+                    <span class="detail-value">{{ sunrise }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-icon">🌇</span>
+                    <span class="detail-label">Sunset</span>
+                    <span class="detail-value">{{ sunset }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Air Quality -->
+        {% if air_quality and air_quality.list %}
+        <div class="air-quality">
+            <h3>Air Quality</h3>
+            <div class="aqi-value aqi-{{ air_quality.list[0].main.aqi }}">
+                AQI: {{ air_quality.list[0].main.aqi }}
+                <span class="aqi-label">
+                    {% if air_quality.list[0].main.aqi == 1 %}Good
+                    {% elif air_quality.list[0].main.aqi == 2 %}Fair
+                    {% elif air_quality.list[0].main.aqi == 3 %}Moderate
+                    {% elif air_quality.list[0].main.aqi == 4 %}Poor
+                    {% else %}Very Poor{% endif %}
+                </span>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <a href="/forecast?city={{ title }}&country={{ country }}&units={{ units }}" class="action-btn forecast-btn">
+                📅 5-Day Forecast
+            </a>
+            <button class="action-btn gps-btn" onclick="getLocationWeather()">
+                📍 Use GPS Location
+            </button>
+            <a href="/history" class="action-btn history-btn">
+                🕒 Search History
+            </a>
+        </div>
+
+        <!-- Enhanced Search Form -->
+        <form action="/weather" class="search-form" id="weatherForm">
+            <div class="form-row">
+                <input 
+                    type="text" 
+                    name="city" 
+                    id="city" 
+                    class="search-input"
+                    placeholder="Enter a city name..."
+                    autocomplete="off"
+                    list="city-suggestions"
+                />
+                <datalist id="city-suggestions"></datalist>
+            </div>
+            
+            <div class="form-row">
+                <select name="country" id="country" class="search-select">
+                    <option value="">Select Country (Optional)</option>
+                    {% for country_name, code in countries.items() %}
+                    <option value="{{ country_name }}" {% if country == code %}selected{% endif %}>
+                        {{ country_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+                
+                <select name="units" id="units" class="search-select">
+                    <option value="metric" {% if units == 'metric' %}selected{% endif %}>Celsius (°C)</option>
+                    <option value="imperial" {% if units == 'imperial' %}selected{% endif %}>Fahrenheit (°F)</option>
+                    <option value="kelvin" {% if units == 'kelvin' %}selected{% endif %}>Kelvin (K)</option>
+                </select>
+            </div>
+            
             <button type="submit" class="search-button">
-                Get Weather
+                🔍 Get Weather
             </button>
         </form>
+
+        <!-- Search History Quick Access -->
+        {% if search_history %}
+        <div class="recent-searches">
+            <h4>Recent Searches</h4>
+            <div class="history-items">
+                {% for item in search_history[:3] %}
+                <a href="/weather?city={{ item.city }}&units={{ item.units }}" class="history-item">
+                    <span class="history-city">{{ item.city }}, {{ item.country }}</span>
+                    <span class="history-temp">{{ "%.1f"|format(item.temp) }}{% if item.units == 'metric' %}°C{% elif item.units == 'imperial' %}°F{% else %}K{% endif %}</span>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
     </div>
 
     <script src="{{ url_for('static', filename='js/weather.js') }}"></script>
